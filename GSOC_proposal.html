@@ -1,0 +1,221 @@
+<html>
+<head>
+<title>Google Summer of Code Proposal - Improving test coverage in Tor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<style>
+
+body {
+    font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 18px;
+    padding-right:100px;
+    padding-left:100px;
+    text-align:justify;
+    margin: 10px 13px 10px 13px;
+}
+
+</style>
+
+</head>
+
+<body>
+<h2>
+Google Summer of Code Proposal - Improving test coverage in Tor
+</h2>
+
+<h3>Abstract</h3>
+
+<p>
+I'd like to improve the test coverage in tor, which is not too good right now. Many of the code files are not tested at all, which is not good for software development, and debugging. 
+</p>
+<p>
+To do this, I'll write more unit tests for Tor, which may require refactoring of code to make the code more testable. To improve integration tests, I will be adding functionality to Chutney, the Tor testing framework. Testers will have the ability to script individual tor nodes via Stem, and Chutney will be used to verify, as well as test, certain parameters of the Tor network.
+</p>  
+    
+
+<h3>What project would you like to work on?</h3>
+<p>I would like to work on Improving test coverage in Tor. This would consist of two parts :-</p>
+
+<ol>
+<li>
+<h4>Improving Unit Test quantity and quality</h4>
+<p>At the moment, the Unit Test coverage of Tor is not too good. Out of 102.9 MB total code, only 32.6 MB is test code. This is about 31 % test code out of the total code. When we compute the Test coverage using gcov, many of the code files are completely untested. To improve this, 
+<ul>
+    <li>The existing code needs to be refactored to make it more testable</li>
+    <li>New test cases need to be written to keep bugs in check, as well as to be sure of the quality of the code.</li>
+    <li>Adding additional features to the unit testing framework TinyTest as per the need.</li> 
+</ul>
+</p>
+
+</li>
+<li>
+<h4>Adding Integration Test support</h4>
+<p>
+The second major part of the project will be to improve integration test coverage of tor. As of now, Tor has a single shell script "test-network.sh" which does some basic test of Starting up some network nodes and waiting for them to bootstrap. Thus, the project will also aim to improve integration test coverage by adding additional functionality to Chutney, so that more complex tests can be applied to the network. This would involve the following,
+<ul>
+    <li>Existing code of Chutney needs some refactoring (Some of it I have already done).</li>
+    <li>Add additional support for scripting individual nodes in a network, as well as a mechanism to assert certain assertions (probably using unittest).</li> 
+</ul>
+</p>
+
+</li>
+</ol>
+
+<p>Chutney currently does the following :- </p>
+<ul>
+    <li>Configure a testing tor network</li>
+    <li>Launch a tor network</li>
+    <li>Monitoring the network - Not completely</li>
+</ul>
+
+<p>
+I am planning to add the following features :- 
+</p>
+<ul>
+    <li>
+    <p>Creating a library to test and verify (or assert) various aspects of the network. For example, support to check how many of the nodes bootstrapped correctly, or what happens to the data if it is sent along a circuit in the tor network</p>
+    </li>
+    
+    <li>
+    <p>Adding an interface to Chutney using which a programmer can script individual Tor network nodes. For example, this can be used to form a Tor circuit in the test network, and send data along the circuit to check if the data at the receiving end is the same as the sending end. </p>
+    </li>
+</ul>
+
+<p>These features will enable me to write Integration tests for the Tor network. This will help developers to test Tor, say after every commit, to check how the Tor network is affected by the changes.
+</p>
+
+<h3>Deliverables</h3>
+<p>Mid term evaluation</p>
+<ul>
+    <li>Complete adding the Node_Controller classes required by Chutney for asserting various parameters of the Tor Network</li>
+    <li>Use a test driven approach to writing Chutney code. That is, I will first make the necessary unit tests for Chutney code, and then proceed to write the actual code. This ensures minimal bugs, and helps in finding code refactoring opportunities early.</li>
+    <li>At the same time, complete a significant portion of writing the unit tests for the untested code of Tor. (I am currently not sure how much I will be able to complete prior to MidTerm)</li>
+</ul>
+
+<p>Final Evaluation</p>
+<ul>
+    <li>Complete the Coding Architecture of Chutney. (Keeping in mind I don't become an <a href="http://www.joelonsoftware.com/articles/fog0000000018.html">Architecture Astronaut</a>).</li>
+    <li>Complete writing the Integration tests on the already completed Chutney framework</li>
+    <li>Complete a good portion of the Unit Tests for Tor</li>
+</ul>
+
+
+<h3>Timeline</h3>
+<h4>April 21 to May 19 - Community Bonding period</h4>
+<p>I'll spend this time in becoming more familiar with the Tor code base. (Although I guess I will already be familiar with it, and may start writing Unit Tests). I would also try to gather more information on what kind of Integration test are needed by Tor in practice.
+</p>
+
+<h4>May 19 to May 26</h4> 
+<p>Write some Unit Tests for the important parts of the Tor codebase. Plan/Implement some of the classes required by Chutney.</p>
+
+
+<h4>May 27 to June 2</h4>
+<p>Complete the TODO list of Chutney, do some Chutney code refactoring.<br> Start implementing the new classes/add functionality to the existing classes based on the need</p>
+
+<h4>June 3 to June 9</h4>
+<p>Write some Unit Tests. (The exact proportion may depend on the time)
+</p>
+
+<h4>June 10 to June 16</h4>
+<p>Complete most of the classes of Chutney, write some Unit Tests for Chutney (if not already written).
+</p>
+
+<h4>June 17 to June 23 - MidTerm week</h4>
+<p>Write more Unit Tests.</p>
+
+<h4>June 24 to June 30</h4>
+<p>Refactor the code of Chutney to improve code quality. Do some optimizations to the code to improve efficiency. Write unit tests for more code files</p>
+
+<h4>July 1 to July 7</h4>
+<p>Finalize Chutney code base, start writing Integration Tests for Tor</p>
+
+<h4>July 8 to July 14</h4>
+<p>Write more Unit Tests for Tor, along with refactoring Tor code to make it more testable.
+</p>
+
+<h4>July 15 to July 21</h4>
+<p>Write some integration tests for the test Tor network. Improve the information content of the diagnostic messages.</p>
+
+<h4>July 22 to July 28</h4>
+<p>Start documenting code side by side, to avoid backlog at the end. Write more Integration tests and Unit Tests.
+</p>
+
+<h4>July 29 to August 4</h4>
+<p>Second refactoring phase. Refactor redundant Chutney and Tor code. Write more Unit Tests for Tor</p>
+
+<h4>August 5 to August 11</h4>
+<p>Spend time on documentation and complete writing Unit Tests. (Buffer time for left over work)
+</p>
+
+<h4>August 11 to August 18</h4>
+<p>If work is complete, spend time on documentation. If not, then there is some buffer time to complete it.</p>
+
+
+
+<h3>Point us to a code sample: something good and clean to demonstrate that you know what you're doing, ideally from an existing project.</h3>
+
+<p>I have been using Open Source software for the past two years. I have contributed two patches to the Chutney code base - <a href="https://github.com/punitkoura/chutney/blob/changes/CHANGES">My github profile</a>.<br>
+Besides this, I have been programming for six years now. I am also a regular programmer at Spoj and Topcoder. Some of the programs I have written can be found <a href="assets/spoj">here</a>.
+<br>
+<br>
+Most of the programs are in C/C++. I also program in Python, but they are smaller projects. <a href="assets/python">Here</a> are some examples, including the one project using the test driven approach of Developing Software.
+<br><br>
+I will be contributing some more patches in the following days to Chutney.
+</p>
+
+
+<h3>Why do you want to work with The Tor Project / EFF in particular?</h3>
+
+<p>
+I was first exposed to Tor when I began using the Tor browser about an year ago. I read a lot about Tor, its ideas, and have viewed the talks given by Roger Dingledine on Tor and Circumvention.
+</p>
+<p> 
+I am now in love with the Internet, and it is a huge part of what I do everyday. But there are still people living in countries with large firewalls preventing free speech on the Internet. People will go to any extent to regain their freedom, if it is taken from them. I have also used Tor for cases when I needed privacy or faced barriers to the Internet. This is one reason I want to work for Tor and EFF, which are working to defend free speech on the Internet, and making the Internet available to people living in highly censored places.
+</p>
+<p>
+The other reason I want to work for Tor is technical. For about an year or so, I have been watching various webcasts of Google, or Foss presentations. I find it thrilling as well as enjoyable to work on code, especially testing it since it is more challenging.
+</p>
+<p>Tor is an amazing project, and I would love to make it better.</p>
+<p>P.S. - Another reason is getting the <a href="https://www.torproject.org/getinvolved/tshirt.html">Tor T-Shirt</a></p> 
+
+
+<h3>Tell us about your experiences in free software development environments.</h3>
+<p>
+Although I have been using Open Source software for the past two years, I haven't made any significant contributions to Free Software. However, I am a part of the Department of Visual Media in our college, where I work on Flash animation with a team of around six people. You can view a sample <a href="http://www.bits-oasis.org/2012/">here</a>.
+</p>
+<p>Apart from that, I am familiar with version control software, bug trackers, etc. I have used them in developing the patches for Chutney mentioned earlier.
+</p>
+
+<h3>Will you be working full-time on the project for the summer?</h3>
+<p>Yes, I have no other engagements during the summer, and will be working full-time on the project.</p>
+
+
+<h3>Will your project need more work and/or maintenance after the summer ends? What are the chances you will stick around and help out with that and other related projects?</h3>
+
+<p>I believe that no software is perfect in every sense. Even though I will try my best that the code is error free, it may require some maintenance after the summer ends. I am also not sure I will be able to complete the Unit Test code for the whole code base. However, my experience with the Tor community has been great, and I would love to stick around afterwards and become a core developer.
+</p>
+
+<h3>What is your ideal approach to keeping  everybody informed of your progress, problems, and questions over the  course of the project?</h3>
+
+<p>I will be writing a weekly or bi-weekly report of my progress to the tor-dev mailing list. IRC is a great place to ask small questions and doubts. For more substantial problems (such as code examples), mailing list will be my ideal choice.
+</p>
+
+<h3>What school are you attending? What year are you, and what's your major/degree/focus? If you're part of a research group, which one?</h3>
+<p>I am an undergraduate student at BITS Pilani, majoring in B.E. Computer Science. I am a third year student. I have done an internship at Bhabha Atomic Research Centre, Mumbai, on Parallel Computing. I am currently part of a research project on "Extraction of pre defined macro level components from digitized murals".
+</p>
+<p>I am a Cisco Certified Network Associate, and am well versed with the basic concepts of Networking.</p>
+
+<h3>How can we contact you to ask you further questions?</h3>
+<p>My personal home page is <a href="http://punitkoura.github.io/">here</a>. You can contact me by email at punitkoura099 [at] gmail [dot] com. I am available in irc at #tor and #tor-dev with nickname 'punitk'.
+</p>
+
+<h3>Are you applying to other projects for GSoC and, if so, what would be your preference if you're accepted to both? </h3>
+<p>As of now, I am not applying to any other project for Gsoc. I will devote most of my time to this project to make myself more comfortable working with Tor.</p>
+
+<h3>Is there anything else that we should know that will make us like your project more?</h3>
+<p>The proposal I have posted here is just a starting point. I think that I have a lot to offer to the Tor community, and this project will just be the starting point of that process.</p>
+
+
+</body>
+</html>
