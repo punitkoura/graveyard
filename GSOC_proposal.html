@@ -69,33 +69,89 @@ The second major part of the project will be to improve integration test coverag
     <li>Monitoring the network - Not completely</li>
 </ul>
 
-<p>
-I am planning to add the following features :- 
-</p>
-<ul>
-    <li>
-    <p>Creating a library to test and verify (or assert) various aspects of the network. For example, support to check how many of the nodes bootstrapped correctly, or what happens to the data if it is sent along a circuit in the tor network</p>
-    </li>
-    
-    <li>
-    <p>Adding an interface to Chutney using which a programmer can script individual Tor network nodes. For example, this can be used to form a Tor circuit in the test network, and send data along the circuit to check if the data at the receiving end is the same as the sending end. </p>
-    </li>
-</ul>
+<h3>Architecture</h3>
 
-<p>These features will enable me to write Integration tests for the Tor network. This will help developers to test Tor, say after every commit, to check how the Tor network is affected by the changes.
-</p>
+<p>There are many goals that Chutney currently aspires to. I will explain how I plan to complete these goals, and what architecture do I have in mind for Chutney.</p>
 
+
+	<b>Functional Tests</b> - These tests are basically to verify the functioning of the tor network, such as the following - 
+		<ul>
+			<li>Does the network bootstrap?</li>
+    		<li>Can I reach foo.com?</li>
+    		<li>Can I reach a hidden service?</li>
+    		<li>Can I reach the client's DNS "resolver"?</li>
+   			<li>Can I use the server's DNS client?</li>
+    		<li>No crashes are observed under any test inputs?</li>
+    		<li>Map address functionality works?</li>
+    		<li>Do all of socks 4, 4a, 5 work?</li>
+		</ul>
+		<br>
+		For these tests, I will use the <a href="https://twistedmatrix.com/trac/">Twisted</a> testing framework (more specifically, the unittest module of Twisted, which extends the Python unittest class). The reason for doing so is twofold :-
+		<ul>
+			<li>Twisted supports the Socks v4 Protocol. There is also an extension to it <a href="https://github.com/ln5/twisted-socks">here</a>, which can be used to extend Twisted capabilities to Socks 4a and 5. Therefore, most of the network related queries can be asserted using Twisted 
+			</li>
+			<li>Since Twisted already supports Network protocols, we need not write the code for handling byte streams flowing through the network. All that would be automatically handled by Twisted unittest framework, thereby enhancing productivity.
+			</li>
+		</ul>
+		
+		<p>So, my basic aim is to create an api for making integration tests for Tor, so that people with little knowledge of the underlying system are able to make tests. This is important since Integration tests are used to verify and test aspects of a tor network, and if making a test means that users have to go through the whole code of tor, then it would not be very helpful. Test makers should be provided with a high level abstraction to the low level code.
+		</p>
+		 
+		<p>Right now, Chutney basically creates a bunch of Nodes, but there is no interconnectivity between them. Therefore, the Node_Controller class needs to be extended with the following functionality :-
+			<ul>
+				<li>Connect to a socket (socks socket) using different versions of socks.</li>
+				<li>Send data to a socket. (Basically, connect to a tor bridge, or a relay)</li>
+				<li>Receive data from the socket</li>
+				<li>Make assertions based on the sent and received data</li>
+			</ul>
+		</p>
+	<p>
+	<b>Bridge related tests</b>:- Apart from these tests, we also need functionality for bridge related tests.
+	<p>These lests would include verifying a node is able to connect to the bridge, bridges announce themselves to the bridge authority.</p>
+	
+	<p>Thus, I will extend the basic node_controller to incorporate the specialities of the bridge testing framework, so that I could perform these specialized tests. This would also enable me to reuse the exchange keys.</p>
+	
+	 <b>Other specification related assertions</b>:- These tests would include stuff like whether the circuit got build as it should have, whether the exit policies are being followed as they should.
+
+	<h3>The proposed structure of Chutney</h3>
+	<p>Chutney</p>
+	
+	<p><b>Node</b> - The actual representation of a Tor node. Maybe create separate subclasses for the different types of Tor nodes?</b>
+	
+	<p><b>NodeBuilder</b> - The base class for building node like objects. It imports the Teisted unittest modules to assert various aspects of the particular Node, stuff like whether a node bootstrapped correctly, is it connected to the relay it shoud connect, etc.
+	</p>
+	<p>
+		<p><b>BridgeBuilder</b> - Responsible for initializing and building the Bridge specific parameters, such as identity keys.</p>
+		<p><b>AuthorityBuilder</b> - Responsible for generating (or reusing?) Authority keys.
+		</p>
+		<p><b>RelayBuilder</b> - Responsible for building a Relay, and serving some clients.
+		</p>
+		
+		<p><b>ClientBuilder</b> - Responsible for building a client node.
+		</p>
+	</p>
+	
+	<p><b>NodeController</b> - The actual heart of the testing framework. This contains the Twisted Unittest module, and the API to control the various types of tor nodes. Internally, I would be integrating the Stem Controller library with Chutney, but for the users, various API calls will be available such as - 
+		</p>
+		<p>
+		Connect
+		Send Data
+		Receive Data
+	</p>
+	<p>
+	And some testing code, making some assertions like is the sent data same as the received data, it the network configured correctly, are the relays working according to their adverised exit policies, etc.
+</p>
 <h3>Deliverables</h3>
 <p>Mid term evaluation</p>
 <ul>
-    <li>Complete adding the Node_Controller classes required by Chutney for asserting various parameters of the Tor Network</li>
+    <li>Complete adding the above mentioned classes required by Chutney for asserting various parameters of the Tor Network</li>
     <li>Use a test driven approach to writing Chutney code. That is, I will first make the necessary unit tests for Chutney code, and then proceed to write the actual code. This ensures minimal bugs, and helps in finding code refactoring opportunities early.</li>
-    <li>At the same time, complete a significant portion of writing the unit tests for the untested code of Tor. (I am currently not sure how much I will be able to complete prior to MidTerm)</li>
+    <li>At the same time, complete a significant portion of writing the unit tests for the untested code of Tor, specifically the functions important to tor.</li>
 </ul>
 
 <p>Final Evaluation</p>
 <ul>
-    <li>Complete the Coding Architecture of Chutney. (Keeping in mind I don't become an <a href="http://www.joelonsoftware.com/articles/fog0000000018.html">Architecture Astronaut</a>).</li>
+    <li>Completion of Chutney framework.</li>
     <li>Complete writing the Integration tests on the already completed Chutney framework</li>
     <li>Complete a good portion of the Unit Tests for Tor</li>
 </ul>
@@ -111,7 +167,7 @@ I am planning to add the following features :-
 
 
 <h4>May 27 to June 2</h4>
-<p>Complete the TODO list of Chutney, do some Chutney code refactoring.<br> Start implementing the new classes/add functionality to the existing classes based on the need</p>
+<p>Complete the TODO list of Chutney, do some Chutney code refactoring (specifically implement the inheritance heirarchy of classes mentioned above).<br> Start implementing the new classes/add functionality to the existing classes based on the need</p>
 
 <h4>June 3 to June 9</h4>
 <p>Write some Unit Tests. (The exact proportion may depend on the time)
@@ -164,7 +220,7 @@ Most of the programs are in C/C++. I also program in Python, but they are smalle
 You can also view the lexer and parser for a compiler written by one of my friends and me <a href="https://github.com/punitkoura/punitkoura.github.io/tree/master/assets/compiler">here</a>. It has been coded entirely in C, from scratch.
 <br><br>
 <b>
-I am working on ConnectionEdge.c for the required unit tests. I will update the proposal when done.
+I am working on ConnectionEdge.c for the required unit tests. One small unit test for test_connection_ap_supports_optimistic_data can be seen <a href="https://github.com/punitkoura/punitkoura.github.io/tree/master/assets/test_connection_edge.c">here</a>.
 </b>
 </p>
 
@@ -197,7 +253,7 @@ Although I have been using Open Source software for the past two years, I haven'
 
 <h3>Will your project need more work and/or maintenance after the summer ends? What are the chances you will stick around and help out with that and other related projects?</h3>
 
-<p>I believe that no software is perfect in every sense. Even though I will try my best that the code is error free, it may require some maintenance after the summer ends. I am also not sure I will be able to complete the Unit Test code for the whole code base. However, my experience with the Tor community has been great, and I would love to stick around afterwards and become a core developer.
+<p>I believe that no software is perfect in every sense. Even though I will try my best that the code is error free, it may require some maintenance after the summer ends. The process of changing the unit tests is a perpetual process, and they would most likely require changes with the changing code base. However, my experience with the Tor community has been great, and I would love to stick around afterwards and become a core developer.
 </p>
 
 <h3>What is your ideal approach to keeping  everybody informed of your progress, problems, and questions over the  course of the project?</h3>
@@ -215,7 +271,7 @@ Although I have been using Open Source software for the past two years, I haven'
 </p>
 
 <h3>Are you applying to other projects for GSoC and, if so, what would be your preference if you're accepted to both? </h3>
-<p>As of now, I am not applying to any other project for Gsoc. I will devote most of my time to this project to make myself more comfortable working with Tor.</p>
+<p>I am not applying to any other project for Gsoc. </p>
 
 <h3>Is there anything else that we should know that will make us like your project more?</h3>
 <p>The proposal I have posted here is just a starting point. I think that I have a lot to offer to the Tor community, and this project will just be the starting point of that process.</p>
@@ -225,6 +281,7 @@ Although I have been using Open Source software for the past two years, I haven'
 <h3>Changes</h3>
 <ul>
 	<li>Added the compiler code information</li>
+	<li>Added the Architecture specification</li>
 </ul>
 
 </body>
